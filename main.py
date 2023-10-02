@@ -58,7 +58,7 @@ def obtain_answers(my_path: str)-> list:
         answ_1aux = row.split("&")#Separate each question's anwers
         aux_row = []
         for q in answ_1aux: #Iterate in each question, q has a format of c|i|i|i
-            answ_2aux = row.split("|") #Separate each element so we have each answer in a position in the list
+            answ_2aux = q.split("|") #Separate each element so we have each answer in a position in the list
             aux_row.append(answ_2aux) #We add the list of anwsers of each question in the row
         final_answers.append(aux_row)
     
@@ -86,4 +86,5 @@ def main():
     #We create the questions according to the path selected, and we save it in a list
     questions = obtain_questions(path)
     answers = obtain_answers(path)
+    print(answers)
 main()
