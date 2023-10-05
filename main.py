@@ -1,7 +1,6 @@
 import os 
 #Visual inspection of how questions and answers are ordered.
 '''
-
 list = range(0,5)
 hacer shuffle a list
 [2, 4, 1, 0, 3]
@@ -63,8 +62,6 @@ def obtain_answers(my_path: str)-> list:
         final_answers.append(aux_row)
     
     return final_answers
-    
-    
 
 def print_map(questions, pos_s : list):
     for i, row in enumerate(questions): #Iterates in questions getting the row and the index of the row
