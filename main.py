@@ -1,33 +1,10 @@
 import os 
 import random
 #Visual inspection of how questions and answers are ordered.
-'''
-list = range(0,5)
-hacer shuffle a list
-[2, 4, 1, 0, 3]
 
-para imprimir-> Vas acceder al valor de la posición, es decir 0
-para comprobar respuestas -> Acceder al mismo valor, es decir (2) el cuál sigue ordenado.
-
-questions = [["q11", "q12", "q13", "q14", "q15"], 
-             ["q21", "q12", "q13", "q14", "q15"],
-             ["q31", "q12", "q13", "q14", "q15"],
-             ["q41", "q12", "q13", "q14", "q15"],
-             ["q51", "q12", "q13", "q14", "q15"]]
-
-            [1, 1] [1, 2] [1, 3] [1, 4] [1, 5]
-            [2, 1] [2, 2] [2, 3] [2, 4] [2, 5]
-            [3, 1] [3, 2] [3, 3] [3, 4] [3, 5]
-            [4, 1] [4, 2] [4, 3] [4, 4] [4, 5]
-            [5, 1] [5, 2] [5, 3] [5, 4] [5, 5]
-
-answers = [[["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"]],
-          [["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"]],
-          [["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"]],
-          [["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"]],
-          [["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"], ["c1", "in1", "in2", "in3"]]]
-'''
-player1, player2 = "p1", "p2"
+continue_game = True
+player1, player2 = "Juanito", "Marco"
+score_p1, score_p2 = 0, 0
 questions = []
 answers = []
 positions_selected = [] #Here we are going to save the positions selected by the players
@@ -39,7 +16,7 @@ categories = {"M": ['mate.txt','ans_mate.txt'], "C": ['cultura.txt','ans_cul.txt
 def ask_players_category(categories: dict) ->str:
     s_category = ""
     while True:
-        print("Estas son las categorías disponibles para el juego: ")
+        print("\n\nEstas son las categorías disponibles para el juego: ")
         print("M: Matemáticas \nC: Cultura general \nO: Musica")
         s_category = input("Ingresa el código de la categoría a elegir: ")
         if (s_category in categories.keys()):
@@ -109,8 +86,13 @@ def ask_position(pos_selected:list)->list:
     mini_list = []
     while True:
         try:
-            x = int(input("\nIngresa la posición x de la pregunta: ")) - 1
-            y = int(input("Ingresa la posición y de la pregunta: ")) - 1
+            x_t = input("\nIngresa la primera posición: ")
+            y_t = input("Ingresa la segunda posición: ")
+
+            if x_t == "end" or y_t == "end":
+                return mini_list
+            x = int(x_t) -1
+            y = int(y_t) -1
             mini_list = [x, y]
             if mini_list in pos_selected:
                 print("Pregunta ya elegida, intentalo nuevamente\n")
@@ -140,14 +122,37 @@ def ask_print_answer(answers_shuf:list,pos_:list)->bool:
                 return False
         print("Respuesta no válida, intentalo nuevamente")
 
+def change_value(index:int)->int:
+    if index == 0:
+        return 1
+    else:
+        return 0
+
 def main():
     global categories
     global questions
     global positions_selected
     global questions_shuf
     global answers_shuf
+    global player1
+    global player2
+    global continue_game
 
-    #We ask the category to the player
+    #Giving instructions: 
+    print("----------------------------------------------------------------------")
+    print("Bienvenido al juego: MARATÓN")
+    print("\nPara elegir una pregunta: ")
+    print("    1.Selecciona una casilla")
+    print("    2.Busca el primer valor que aparece en la casilla y digítalo")
+    print("    3.Digita el segundo valor que aparece en la casilla")
+    print("\nPara responder digita A, B, C o D en el momento en el que te lo pidan")
+    print("Diviertanse!\n")
+    input("Presiona Enter para continuar")
+    
+    player1 = input("Ingresa el nombre del jugador 1: ")
+    player2 = input("Ingresa el nombre del jugador 2: ")
+    
+    #We ask the category to the players
     choosen_category = ask_players_category(categories)
     #We open the folder of the text acording to the selected category 
     path = categories[choosen_category]
@@ -158,14 +163,38 @@ def main():
     #Shuffling questions and answers
     questions_shuf = shuffle_questions(questions)
     answers_shuf = shuffle_answers(answers)
-
-    #Start asking the player
-    print_map(questions_shuf, positions_selected)
-    posxy = ask_position(positions_selected)
-    #Print question acording to positions selected
-    print("-----------------------------------QUESTION TIME-----------------------------------")
-    print(questions_shuf[posxy[0]][posxy[1]])
-    #Print answers according to positions
-    is_correct = ask_print_answer(answers_shuf, posxy)
-    print(is_correct)
+    scores = [0, 0] #Always the first value is the score of the player who starts
+    #To define which player starts
+    players = [player1, player2]
+    i_playerS = random.randint(0, 1) 
+    while continue_game:
+        print("-----------------------------------------------------------------------------------------")
+        print("Es el turno de <<"+players[i_playerS]+">>")
+        #Start asking the player
+        print_map(questions_shuf, positions_selected)
+        posxy = ask_position(positions_selected)
+        if len(posxy) == 0:
+            print("->Has decidido terminar el juego")
+            break
+        #Print question acording to positions selected
+        print("\n"+questions_shuf[posxy[0]][posxy[1]])
+        #Print answers according to positions
+        is_correct = ask_print_answer(answers_shuf, posxy)
+        if is_correct:
+            print("CORRECTO! Has sumado "+str(posxy[0]+1)+" puntos")
+            scores[i_playerS] += posxy[0]+1
+        else:
+            print("Incorrecto, lo siento :(")
+        print("PUNTOS ACUMULADOS: "+str(scores[i_playerS]))
+        #At the end we need to change the value of i_playerS
+        i_playerS = change_value(i_playerS)
+        if len(positions_selected) == 25:
+            print("->No quedan mas preguntas disponibles")
+            break
+    #Showing the result:
+    print("\n\n------------------------------------------------------------------------")
+    print("RESULTADOS: ")
+    print(players[i_playerS]+": "+str(scores[i_playerS])+" puntos")
+    i_playerS = change_value(i_playerS)
+    print(players[i_playerS]+": "+str(scores[i_playerS])+" puntos")
 main()
