@@ -149,8 +149,13 @@ def main():
     print("Diviertanse!\n")
     input("Presiona Enter para continuar")
     
-    player1 = input("Ingresa el nombre del jugador 1: ")
-    player2 = input("Ingresa el nombre del jugador 2: ")
+    while True:
+        player1 = input("Ingresa el nombre del jugador 1: ")
+        player2 = input("Ingresa el nombre del jugador 2: ")
+        if len(player1)>0 and len(player2)>0:
+            break
+        else:
+            print("Los nombres de usuario deben de contener al menos un caracter")
     
     #We ask the category to the players
     choosen_category = ask_players_category(categories)
