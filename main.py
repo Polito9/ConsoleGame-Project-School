@@ -88,7 +88,6 @@ def ask_position(pos_selected:list)->list:
         try:
             x_t = input("\nIngresa la primera posición: ")
             y_t = input("Ingresa la segunda posición: ")
-
             if x_t == "end" or y_t == "end":
                 return mini_list
             x = int(x_t) -1
@@ -107,7 +106,6 @@ def ask_position(pos_selected:list)->list:
 #Show position accoring to the specified
 def ask_print_answer(answers_shuf:list,pos_:list)->bool:
     arr = ["A", "B", "C", "D"]
-
     answers = answers_shuf[pos_[0]][pos_[1]]
     correct = answers[0]
     random.shuffle(answers)
@@ -146,6 +144,7 @@ def main():
     print("    2.Busca el primer valor que aparece en la casilla y digítalo")
     print("    3.Digita el segundo valor que aparece en la casilla")
     print("\nPara responder digita A, B, C o D en el momento en el que te lo pidan")
+    print("\nSi quieres terminar el juego, digita 'end' cuando te pidan alguna posición")
     print("Diviertanse!\n")
     input("Presiona Enter para continuar")
     
@@ -190,16 +189,37 @@ def main():
             scores[i_playerS] += posxy[0]+1
         else:
             print("Incorrecto, lo siento :(")
-        print("PUNTOS ACUMULADOS: "+str(scores[i_playerS]))
+            #Change the value to start stealing points from the other player
+            i_playerS = change_value(i_playerS)
+            print("\nAhora es el turno de robar de <<"+players[i_playerS]+">>")
+            print("\n"+questions_shuf[posxy[0]][posxy[1]])
+            #Print answers according to positions
+            is_correct = ask_print_answer(answers_shuf, posxy)
+            if is_correct:
+                print("CORRECTO! Has robado "+str(posxy[0]+1)+" puntos")
+                scores[i_playerS] += posxy[0]+1
+            else:
+                print("Incorrecto, tu también has fallado :(")
+            i_playerS = change_value(i_playerS)
+
+        print("PUNTOS ACUMULADOS DE "+players[i_playerS]+": "+str(scores[i_playerS]))
         #At the end we need to change the value of i_playerS
         i_playerS = change_value(i_playerS)
+        print("PUNTOS ACUMULADOS DE "+players[i_playerS]+": "+str(scores[i_playerS]))
         if len(positions_selected) == 25:
             print("->No quedan mas preguntas disponibles")
             break
+
     #Showing the result:
     print("\n\n------------------------------------------------------------------------")
     print("RESULTADOS: ")
     print(players[i_playerS]+": "+str(scores[i_playerS])+" puntos")
     i_playerS = change_value(i_playerS)
     print(players[i_playerS]+": "+str(scores[i_playerS])+" puntos")
+    if (scores[0]> scores[1]):
+        print("El ganador es "+players[0])
+    elif (scores[0]< scores[1]):
+        print("El ganador es "+players[1])
+    else:
+        print("\nHa habido un empate")
 main()
