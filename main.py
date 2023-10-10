@@ -104,7 +104,7 @@ def ask_position(pos_selected:list)->list:
             print("Valor ingresado incorrectamente, intentalo nuevamente\n")
     return mini_list
 #Show position accoring to the specified
-def ask_print_answer(answers_shuf:list,pos_:list)->bool:
+def ask_print_answer(answers_shuf:list,pos_:list)->list:
     arr = ["A", "B", "C", "D"]
     answers = answers_shuf[pos_[0]][pos_[1]]
     correct = answers[0]
@@ -115,11 +115,22 @@ def ask_print_answer(answers_shuf:list,pos_:list)->bool:
         user_answer = input("Respuesta: ")
         if user_answer.upper() in arr:
             if answers[arr.index(user_answer.upper())] == correct:
+                return [True]
+            else:
+                return [False, correct, answers]
+        print("Respuesta no válida, intentalo nuevamente")
+def ask_print_answer_noShuffle(answers: list, correct: str)->bool:
+    arr = ["A", "B", "C", "D"]
+    for i, answer in enumerate(answers):
+        print(arr[i]+")"+answer)
+    while True:
+        user_answer = input("Respuesta: ")
+        if user_answer.upper() in arr:
+            if answers[arr.index(user_answer.upper())] == correct:
                 return True
             else:
                 return False
         print("Respuesta no válida, intentalo nuevamente")
-
 def change_value(index:int)->int:
     if index == 0:
         return 1
@@ -184,22 +195,25 @@ def main():
         print("\n"+questions_shuf[posxy[0]][posxy[1]])
         #Print answers according to positions
         is_correct = ask_print_answer(answers_shuf, posxy)
-        if is_correct:
-            print("CORRECTO! Has sumado "+str(posxy[0]+1)+" puntos")
+        if is_correct[0]:
+            print("\nCORRECTO! Has sumado "+str(posxy[0]+1)+" puntos")
             scores[i_playerS] += posxy[0]+1
         else:
-            print("Incorrecto, lo siento :(")
+            print("\nIncorrecto, lo siento :(")
+            correct_ans = is_correct[1]
             #Change the value to start stealing points from the other player
             i_playerS = change_value(i_playerS)
             print("\nAhora es el turno de robar de <<"+players[i_playerS]+">>")
+            #Print question acording to positions selected
             print("\n"+questions_shuf[posxy[0]][posxy[1]])
             #Print answers according to positions
-            is_correct = ask_print_answer(answers_shuf, posxy)
+            is_correct = ask_print_answer_noShuffle(is_correct[2], correct_ans)
             if is_correct:
-                print("CORRECTO! Has robado "+str(posxy[0]+1)+" puntos")
+                print("\nCORRECTO! Has robado "+str(posxy[0]+1)+" puntos")
                 scores[i_playerS] += posxy[0]+1
             else:
-                print("Incorrecto, tu también has fallado :(")
+                print("\nIncorrecto, tu también has fallado :(")
+                print("->La respuesta correcta era: "+correct_ans)
             i_playerS = change_value(i_playerS)
 
         print("PUNTOS ACUMULADOS DE "+players[i_playerS]+": "+str(scores[i_playerS]))
@@ -217,9 +231,9 @@ def main():
     i_playerS = change_value(i_playerS)
     print(players[i_playerS]+": "+str(scores[i_playerS])+" puntos")
     if (scores[0]> scores[1]):
-        print("El ganador es "+players[0])
+        print("El/La ganador/a es "+players[0])
     elif (scores[0]< scores[1]):
-        print("El ganador es "+players[1])
+        print("El/La ganador/a es "+players[1])
     else:
         print("\nHa habido un empate")
 main()
