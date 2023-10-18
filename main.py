@@ -1,16 +1,17 @@
 import os 
 import random
-#Visual inspection of how questions and answers are ordered.
-
+#Global variables
 continue_game = True
-player1, player2 = "Juanito", "Marco"
+player1, player2 = "", ""
 score_p1, score_p2 = 0, 0
-questions = []
-answers = []
+questions = [] #Matrix where we are going to add the questions list[list]
+answers = [] #Matrix where we are going to add the answers list[list[list]]
 positions_selected = [] #Here we are going to save the positions selected by the players
-questions_shuf = []
-answers_shuf = []
-shuffled_pos = []
+#To shuffling things
+questions_shuf = [] 
+answers_shuf = [] 
+shuffled_pos = [] 
+#Dict that saves the name of the file for questions and answers 
 categories = {"M": ['mate.txt','ans_mate.txt'], "C": ['cultura.txt','ans_cul.txt'], "O": ['musica.txt','ans_mus.txt']}
 
 def ask_players_category(categories: dict) ->str:
@@ -19,15 +20,15 @@ def ask_players_category(categories: dict) ->str:
         print("\n\nEstas son las categorías disponibles para el juego: ")
         print("M: Matemáticas \nC: Cultura general \nO: Musica")
         s_category = input("Ingresa el código de la categoría a elegir: ")
-        if (s_category in categories.keys()):
+        if (s_category in categories.keys()): #Detects if a category key is valid and if not it ask again
             break
         print("->Código no válido, intentalo nuevamente. \n\n")
     return s_category
 
 #Using files
-def obtain_questions(my_path : str) ->list:
-    path_ = os.getcwd()
-    file = open(os.path.join(path_,'questions' , my_path[0]), 'r', encoding='utf-8')
+def obtain_questions(my_path : str) ->list: #Read the questions from the file
+    path_ = os.getcwd() #Get the actual directory
+    file = open(os.path.join(path_, my_path[0]), 'r', encoding='utf-8')
     questions = []
     for row in file: #Iterates each row
         question_aux = []
@@ -37,22 +38,23 @@ def obtain_questions(my_path : str) ->list:
     file.close()
     return questions
 
-def obtain_answers(my_path: str)-> list:
+def obtain_answers(my_path: str)-> list: #Read the answers from the file
     final_answers = []
     path = os.getcwd()
-    file = open(os.path.join(path,'questions' , my_path[1]), 'r', encoding='utf-8')
+    file = open(os.path.join(path, my_path[1]), 'r', encoding='utf-8')
     for row in file: #We separate for each row
         answ_1aux = row.split("&")#Separate each question's anwers
         aux_row = []
         for q in answ_1aux: #Iterate in each question, q has a format of c|i|i|i
             answ_2aux = q.split("|") #Separate each element so we have each answer in a position in the list
-            answ_1aux[-1] = answ_1aux[-1][:-1] #Removing the \n
+            answ_1aux[-1] = answ_1aux[-1][:-1] #Removing the \n by slicing the last element of the list
             aux_row.append(answ_2aux) #We add the list of anwsers of each question in the row
         final_answers.append(aux_row)
-    
+    file.close()
     return final_answers
+
 #Printing things
-def print_map(questions, pos_s : list):
+def print_map(questions:list, pos_s : list):
     for i, row in enumerate(questions): #Iterates in questions getting the row and the index of the row
         for j in range(len(row)): #Iterates the index of the row
             if not ([i, j] in pos_s): #Validates if that is not a selected position
@@ -82,7 +84,7 @@ def shuffle_answers(answers):
     return(answers_shuf)
 
 #Ask position to the player
-def ask_position(pos_selected:list)->list:
+def ask_position(pos_selected:list)->list:#Validates if x, y is a valid position, if it is, it returns a mini_list[x, y]
     mini_list = []
     while True:
         try:
@@ -103,21 +105,22 @@ def ask_position(pos_selected:list)->list:
         except:
             print("Valor ingresado incorrectamente, intentalo nuevamente\n")
     return mini_list
+
 #Show position accoring to the specified
 def ask_print_answer(answers_shuf:list,pos_:list)->list:
     arr = ["A", "B", "C", "D"]
     answers = answers_shuf[pos_[0]][pos_[1]]
-    correct = answers[0]
-    random.shuffle(answers)
-    for i, answer in enumerate(answers):
+    correct = answers[0] #Saves the first position, that is always the correct one
+    random.shuffle(answers)#Shuffles the new list of answers
+    for i, answer in enumerate(answers):#Printing in the correct format
         print(arr[i]+")"+answer)
-    while True:
+    while True:#Validates the answer
         user_answer = input("Respuesta: ")
         if user_answer.upper() in arr:
-            if answers[arr.index(user_answer.upper())] == correct:
+            if answers[arr.index(user_answer.upper())] == correct: #Validates the index of arr with the answers shuffled, and now it checks with correct
                 return [True]
             else:
-                return [False, correct, answers]
+                return [False, correct, answers] #Returns the correct value, and the order of answers to not be shuffled when the other player anwers
         print("Respuesta no válida, intentalo nuevamente")
 def ask_print_answer_noShuffle(answers: list, correct: str)->bool:
     arr = ["A", "B", "C", "D"]
@@ -187,6 +190,7 @@ def main():
         print("Es el turno de <<"+players[i_playerS]+">>")
         #Start asking the player
         print_map(questions_shuf, positions_selected)
+        #
         posxy = ask_position(positions_selected)
         if len(posxy) == 0:
             print("->Has decidido terminar el juego")
